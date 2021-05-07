@@ -22,7 +22,7 @@ A script for colouring residues according to some external data set (e.g. satura
 
 ### `Measure_Dist.py`
 A script for measuring the distance between the alpha carbon atoms of residues in two separate chains in a PDB file.
-* Call script through command line with 3 arguments:
+* Call script through command line with 2 arguments:
     1. "structure_name.pdb" (PDB file with structure coordinates)
     2. "output_values.txt" (Text file, 3 columns, output written here)
 * Optional arguments:
@@ -35,9 +35,10 @@ A script for measuring the distance between the alpha carbon atoms of residues i
 
 ### `Colour_Resi.py`
 A script for colouring residues by reading from a formatted text file.
-* Call script through command line with 3 arguments:
+* Call script through command line with 5 arguments:
     1. "structure_name.pdb" (PDB file with structure coordinates)
-    2. "colour_residues.txt" (Text file, single column, containing residue numbers/ranges to colour; separate the categories with #[title])
+    2. "colour_residues.txt" (Text file, single column, containing residue numbers/ranges to colour)
+        * Separate the categories with #[title]
         * See: `input_colour-resi.txt`
     3. "output_name.pse" (PyMol session file, output written here, viewable in PyMol)
     4. [-n] (number of categories in colour_residues.txt [default: 3])
@@ -46,6 +47,47 @@ A script for colouring residues by reading from a formatted text file.
     1. [--chain] (specify chain to colour [default: automatic])
     2. [--bg] (specify colour for unselected residues [default: `white`])
     3. [--rep] (visualise all selected residues as sticks, spheres etc. [default: none])
+
+### `Colour_Resi_Name.py`
+A modification of `Colour_Resi.py` that colours a specified list of residues in the system according to their name and chemical properties.
+* Call script through command line with 3 arguments:
+    1. "structure_name.pdb" (PDB file with structure coordinates)
+    2. "residues.txt" (Text file, single column, containing residue numbers/ranges to colour)
+        * Separate the categories with #[title]
+        * See: `input_colour-name.txt`
+    3. "output_name.pse" (PyMol session file, output written here, viewable in PyMol)
+* Optional arguments:
+    1. [--chain] (specify chain to colour [default: automatic])
+    2. [--bg] (specify colour for unselected residues [default: `white`])
+    3. [--rep] (visualise all selected residues as sticks, spheres etc. [default: none])
+
+* __Important:__ The colouring for different residues is defined in the script itself; see `20_NATAA_colourscheme.pse` for a visual representation of the different colours. These can be changed at any time by modifying the script (see below).
+
+### `Colour_Resi_Spectra.py`
+A modification of `Colour_Resi.py` and `SatMut_Colour.py` that colours residues according to different colour spectra by reading from a formatted text file.
+* Call script through command line with 5 arguments:
+    1. "structure_name.pdb" (PDB file with structure coordinates)
+    2. "colour_residues.txt" (Text file, two columns, space-separated)
+        * Field 1 contains residue numbers/ranges to colour
+        * Field 2 contains numerical value associated with that position used to colour according to respective spectrum; separate the categories with #[title])
+        * Separate the categories with #[title]
+        * See: `input_colour-spectra.txt`
+    3. "output_name.pse" (PyMol session file, output written here, viewable in PyMol)
+    4. [-n] (number of categories in colour_residues.txt [default: 3])
+    5. [-s] (spectra to apply to each residue category in colour_residues.txt [default: red_green, yellow_blue, cyan_magenta])
+* Optional arguments:
+    1. [--chain] (specify chain to colour [default: automatic])
+    2. [--bg] (specify colour for unselected residues [default: `white`])
+    3. [--rep] (visualise all selected residues as sticks, spheres etc. [default: none])
+    4. [--na] (set colour for NA/missing values, if present in the data)
+    5. [--custom_range] (if range of values differs between spectra, set this flag to input minimum and maximum values for each category's range directly [default: min 0, max 1])
+    
+### `Merge_Sessions.py`
+A script for merging large numbers of separate PyMol sessions into a single file and superimposing homologous regions atop one another.
+* Call script through command line with 2 arguments:
+    1. "input_sessions_list.txt" (Text file, single column, containing file names of PyMol session files [*.pse] to merge and align.
+        * See: `input_merge_sessions.txt`
+    2. "output_session.pse" (PyMol session file, output written here, viewable in PyMol)
 
 ## Requirements
 
@@ -59,7 +101,7 @@ To use, run script on the command line with the appropriate arguments (see above
 
     `python /path/to/pymol_script [arguments]`
 
-You may find it necessary to alter access permissions for this file to execute.
+You may find it necessary to alter access permissions for the script to execute it.
 
 If for whatever reason you cannot use Python through the command line, you can instead try pasting and running the individual lines of code in PyMol's command line, with the variables set to the files you wish to input rather than system arguments. However, this may run into problems and is not recommended.
 
@@ -72,6 +114,12 @@ Navigate to the `examples` folder and run the following commands:
     `python ../Measure_Dist.py example_structure.pdb output_measure-dist.txt --chainA O --chainB T --rangeA 86 100 --rangeB 16 31`
     
     `python ../Colour_Resi.py example_structure.pdb input_colour-resi.txt output_colour-resi.pse -n 3 -c red blue green --chain O --rep licorice --bg white`
+    
+    `python ../Colour_Resi_Name.py example_structure2.pdb input_colour-name.txt output_colour-name.pse --rep licorice`
+    
+    `python ../Colour_Resi_Spectra.py example_structure2.pdb input_colour-spectra.txt output_colour-spectra.pse -n 3 --rep licorice --bg white`
+    
+    `python ../Merge_Sessions.py input_merge_sessions.txt output_merge_sessions.pse`
 
 ## Script Modifications
 
@@ -85,3 +133,11 @@ Certain elements of the script may be modified to suit user preferences.
     * Refer to the [selection macro syntax](https://pymolwiki.org/index.php/Selection_Macros) help page for more information.
 * For residue recolouring scripts, you may wish to change the spectrum of colours that PyMol uses. The default is `red_yellow_green`; PyMol has a selection of colour palettes available, or you can specify the individual colours as space-separated arguments (e.g. `--palette red yellow green`)
     * Refer to the [Spectrum](https://pymolwiki.org/index.php/Spectrum) function help page for more information.
+* The residue colouring for `Colour_Resi_Name.py` is defined by a dictionary that maps the three-letter code for a particular residue to a corresponding colour.
+    * Aliphatic hydrocarbon residues are coloured in shades of green
+    * Large aromatic residues are coloured in shades of orange
+    * Basic charged residues are coloured in shades of blue
+    * Acidic charged residues are coloured in shades of red
+    * Polar residues are coloured in shades of magenta
+    * Glycine is grey, cysteine is cyan, proline is purple and methionine is yellow
+    * These can be readily changed if desired; consult the available colours for your PyMol version.
